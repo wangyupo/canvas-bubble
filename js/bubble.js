@@ -53,20 +53,25 @@ export default class bubble {
     this.draw();
   }
 
+  reset() {
+    this.x = Math.random() * (this.bgwidth - this.radius * 2) + this.radius;
+    this.y = Math.random() * (this.bgheight - this.radius * 2) + this.radius;
+    this.dx = Math.random() - 0.5;
+    this.dy = Math.random() - 0.5;
+    this.clickX = 0;
+    this.clickY = 0;
+  }
+
   judge() {
     if (!this.clickX || !this.targetX) return;
     //两点距离小于半径即为点中
     let dep = Math.sqrt(Math.pow((this.clickX - this.targetX), 2) + Math.pow((this.clickY - this.targetY), 2));
     if (dep < this.radius) {
       score.update();
-      this.x = Math.random() * (this.bgwidth - this.radius * 2) + this.radius;
-      this.y = Math.random() * (this.bgheight - this.radius * 2) + this.radius;
-      this.dx = Math.random() - 0.5;
-      this.dy = Math.random() - 0.5;
-      this.clickX = 0;
-      this.clickY = 0;
+      this.reset();
       this.update();
     } else {
+      this.reset();
       score.gameover();
     }
   }
