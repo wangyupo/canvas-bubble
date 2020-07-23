@@ -2,29 +2,21 @@ import SCORE from "./score.js";
 let score = new SCORE();
 
 export default class bubble {
-  constructor(ctx, x, y, dx, dy, radius, bgwidth, bgheight, target) {
+  constructor(ctx, radius, bgwidth, bgheight, target) {
     this.ctx = ctx;
-    this.x = x;
-    this.y = y;
-    this.dx = dx;
-    this.dy = dy;
     this.radius = radius;
     this.bgwidth = bgwidth;
     this.bgheight = bgheight;
     this.target = target;
     this.targetX = 0;
     this.targetY = 0;
+    this.speed = 0.5;
+    this.reset();
 
-    this.clickX = 0;
-    this.clickY = 0;
     document.addEventListener('click', event => {
       this.clickX = event.x;
       this.clickY = event.y;
     });
-    // document.addEventListener('mouseup', event => {
-    //   this.clickX = 0;
-    //   this.clickY = 0;
-    // });
   }
 
   draw() {
@@ -53,13 +45,21 @@ export default class bubble {
     this.draw();
   }
 
-  reset() {
+  reset(resetLevel) {
     this.x = Math.random() * (this.bgwidth - this.radius * 2) + this.radius;
     this.y = Math.random() * (this.bgheight - this.radius * 2) + this.radius;
-    this.dx = Math.random() - 0.5;
-    this.dy = Math.random() - 0.5;
+    this.dx = Math.random() - this.speed;
+    this.dy = Math.random() - this.speed;
     this.clickX = 0;
     this.clickY = 0;
+    if (resetLevel) {
+      this.speed = 0.5;
+    }
+    this.draw();
+  }
+
+  levelUp() {
+    this.speed -= 0.5;
   }
 
   judge() {
@@ -68,11 +68,11 @@ export default class bubble {
     let dep = Math.sqrt(Math.pow((this.clickX - this.targetX), 2) + Math.pow((this.clickY - this.targetY), 2));
     if (dep < this.radius) {
       score.update();
+      this.levelUp();
       this.reset();
-      this.update();
     } else {
-      this.reset();
       score.gameover();
+      this.reset(true);
     }
   }
 }
