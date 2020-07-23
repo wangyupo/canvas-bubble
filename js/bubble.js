@@ -1,36 +1,39 @@
-import SCORE from "./score.js";
-let score = new SCORE();
+var mouse = {
+  x: undefined,
+  y: undefined
+}
+var maxRadius = 40;
+var colorArray = [
+  '#D98832',
+  '#DDE334',
+  '#39CC8A',
+  '#3453E3',
+  '#DB30BD'
+];
+window.addEventListener("mousemove", function (event) {
+  mouse.x = event.x;
+  mouse.y = event.y;
+})
 
 export default class bubble {
-  constructor(ctx, radius, bgwidth, bgheight, target) {
+  constructor(ctx, x, y, dx, dy, radius, bgwidth, bgheight) {
     this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
     this.radius = radius;
+    this.minRadius = radius;
     this.bgwidth = bgwidth;
     this.bgheight = bgheight;
-    this.target = target;
-    this.targetX = 0;
-    this.targetY = 0;
-    this.speed = 0.5;
-    this.reset();
-
-    document.addEventListener('click', event => {
-      this.clickX = event.x;
-      this.clickY = event.y;
-    });
+    this.color = colorArray[Math.floor(Math.random() * colorArray.length)];
   }
 
   draw() {
     this.ctx.beginPath();
-    this.ctx.strokeStyle = "blue";
     this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    if (this.target) {
-      this.ctx.fillStyle = "#00f";
-      this.targetX = this.x;
-      this.targetY = this.y;
-      this.ctx.fill();
-    } else {
-      this.ctx.stroke();
-    }
+    this.ctx.fillStyle = this.color;
+    this.ctx.fill();
   }
 
   update() {
@@ -42,37 +45,14 @@ export default class bubble {
     }
     this.x += this.dx;
     this.y += this.dy;
-    this.draw();
-  }
 
-  reset(resetLevel) {
-    this.x = Math.random() * (this.bgwidth - this.radius * 2) + this.radius;
-    this.y = Math.random() * (this.bgheight - this.radius * 2) + this.radius;
-    this.dx = Math.random() - this.speed;
-    this.dy = Math.random() - this.speed;
-    this.clickX = 0;
-    this.clickY = 0;
-    if (resetLevel) {
-      this.speed = 0.5;
+    if (Math.abs(mouse.x - this.x) < 50 && Math.abs(mouse.y - this.y) < 50) {
+      if (this.radius < maxRadius)
+        this.radius += 1;
+    } else if (this.radius > this.minRadius) {
+      this.radius -= 1;
     }
+
     this.draw();
-  }
-
-  levelUp() {
-    this.speed -= 0.5;
-  }
-
-  judge() {
-    if (!this.clickX || !this.targetX) return;
-    //两点距离小于半径即为点中
-    let dep = Math.sqrt(Math.pow((this.clickX - this.targetX), 2) + Math.pow((this.clickY - this.targetY), 2));
-    if (dep < this.radius) {
-      score.update();
-      this.levelUp();
-      this.reset();
-    } else {
-      score.gameover();
-      this.reset(true);
-    }
   }
 }
